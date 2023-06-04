@@ -1853,6 +1853,26 @@ class getData(SearchList):
                 obs_output = cloud_cover
             elif obs == "aqi":
                 obs_output = aqi
+            elif obs == "UVRad":
+                obs_uvrad_output = "<span class='UV'>%s</span><!-- AJAX -->" % str(getattr(current, "UV"))
+                obs_uvrad_output += "&nbsp;<span class='border-left'>&nbsp;</span>"
+                obs_uvrad_output += (
+                    "<span class='radiation'>%s</span><!-- AJAX -->"
+                    % str(getattr(current, "radiation"))
+                )
+
+                # Empty field for the JSON "current" output
+                obs_output = ""
+            elif obs == "InTempHumid":
+                obs_intemphum_output = "<span class='station-observations-label'>%s</span><!-- AJAX -->" % str(getattr(current, "extraTemp4"))
+                obs_intemphum_output += "&nbsp;<span class='border-left'>&nbsp;</span>"
+                obs_intemphum_output += (
+                    "<span class='station-observations-label'>%s</span><!-- AJAX -->"
+                    % str(getattr(current, "extraHumid4"))
+                )
+
+                # Empty field for the JSON "current" output
+                obs_output = ""
             else:
                 obs_output = getattr(current, obs)
                 if "?" in str(obs_output):
@@ -1878,6 +1898,12 @@ class getData(SearchList):
                     obs,
                     obs_output,
                 )
+            if obs == "UVRad":
+                # Add special UV + radiation one liner
+                station_obs_html += obs_uvrad_output
+            if obs == "InTempHumid":
+                # Add special Temp/Humididy one liner
+                station_obs_html += obs_intemphum_output
             if obs in ("barometer", "pressure", "altimeter"):
                 # Append the trend arrow to the pressure observation. Need this
                 # for non-mqtt pages
