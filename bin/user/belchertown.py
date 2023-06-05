@@ -1864,11 +1864,11 @@ class getData(SearchList):
                 # Empty field for the JSON "current" output
                 obs_output = ""
             elif obs == "InTempHumid":
-                obs_intemphum_output = "<span class='station-observations-label'>%s</span><!-- AJAX -->" % str(getattr(current, "extraTemp4"))
+                obs_intemphum_output = "<span class='station-observations-label'>%s</span><!-- AJAX -->" % str(getattr(current, "inTemp"))
                 obs_intemphum_output += "&nbsp;<span class='border-left'>&nbsp;</span>"
                 obs_intemphum_output += (
                     "<span class='station-observations-label'>%s</span><!-- AJAX -->"
-                    % str(getattr(current, "extraHumid4"))
+                    % str(getattr(current, "InHumidity"))
                 )
 
                 # Empty field for the JSON "current" output
