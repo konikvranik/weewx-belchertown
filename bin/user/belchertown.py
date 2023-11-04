@@ -1064,7 +1064,7 @@ class getData(SearchList):
         ):
 
             forecast_file = html_root + "/json/forecast.json"
-            
+
             if self.generator.skin_dict["Extras"]["forecast_provider"] == "weatherflow":
                 forecast_api_id = self.generator.skin_dict["Extras"]["forecast_weatherflow_stationid"]
                 forecast_api_secret = self.generator.skin_dict["Extras"][
@@ -1075,7 +1075,7 @@ class getData(SearchList):
                 forecast_api_secret = self.generator.skin_dict["Extras"][
                     "forecast_api_secret"
                 ]
-            
+
             forecast_units = self.generator.skin_dict["Extras"][
                 "forecast_units"
             ].lower()
@@ -1093,7 +1093,7 @@ class getData(SearchList):
                 if condition:
                     key = condition.replace(' ','_').lower()
                     return label_dict[key]
-                    
+
             def aeris_coded_weather(data):
                 # https://www.aerisweather.com/support/docs/api/reference/weather-codes/
                 output = ""
@@ -1257,14 +1257,14 @@ class getData(SearchList):
                     unit_pres = "inhg"
                     unit_prec = "in"
                     unit_wind = "mph"
-                    
+
                     if forecast_units != "us":
                         unit_dist = "km"
                         unit_temp = "c"
                         unit_pres = "hpa"
                         unit_prec = "cm"
                         unit_wind = "mps"
-                    
+
                     if forecast_units == "ca":
                         unit_wind = "kph"
                     elif forecast_units == "uk2":
@@ -1272,7 +1272,7 @@ class getData(SearchList):
                     elif forecast_units == "de":
                         unit_wind = "kts"
                         unit_prec = "mm"
-                        
+
                     forecast_weatherflow_url = "https://swd.weatherflow.com/swd/rest/better_forecast?station_id=%s&token=%s&units_temp=%s&units_wind=%s&units_pressure=%s&units_precip=%s&units_distance=%s" % (
                         forecast_api_id,
                         forecast_api_secret,
@@ -1419,7 +1419,7 @@ class getData(SearchList):
                             req = Request(forecast_weatherflow_url, None, headers)
                             response = urlopen(req)
                             forecast_file_result = response.read()
-                            response.close()                           
+                            response.close()
                 except Exception as error:
                     raise Warning(
                         "Error downloading forecast data. "
@@ -1908,6 +1908,27 @@ class getData(SearchList):
                         "Error adding aqi to station observations table. "
                         "Check that you have forecast data, or remove aqi from your station_observations Extras option."
                     )
+                obs_output = aqi
+            elif obs == "UVRad":
+                obs_uvrad_output = "<span class='UV'>%s</span><!-- AJAX -->" % str(getattr(current, "UV"))
+                obs_uvrad_output += "&nbsp;<span class='border-left'>&nbsp;</span>"
+                obs_uvrad_output += (
+                    "<span class='radiation'>%s</span><!-- AJAX -->"
+                    % str(getattr(current, "radiation"))
+                )
+
+                # Empty field for the JSON "current" output
+                obs_output = ""
+            elif obs == "InTempHumid":
+                obs_intemphum_output = "<span class='station-observations-label'>%s</span><!-- AJAX -->" % str(getattr(current, "inTemp"))
+                obs_intemphum_output += "&nbsp;<span class='border-left'>&nbsp;</span>"
+                obs_intemphum_output += (
+                    "<span class='station-observations-label'>%s</span><!-- AJAX -->"
+                    % str(getattr(current, "InHumidity"))
+                )
+
+                # Empty field for the JSON "current" output
+                obs_output = ""
             else:
                 obs_output = getattr(current, obs)
                 if "?" in str(obs_output):
@@ -1933,6 +1954,12 @@ class getData(SearchList):
                     obs,
                     obs_output,
                 )
+            if obs == "UVRad":
+                # Add special UV + radiation one liner
+                station_obs_html += obs_uvrad_output
+            if obs == "InTempHumid":
+                # Add special Temp/Humididy one liner
+                station_obs_html += obs_intemphum_output
             if obs in ("barometer", "pressure", "altimeter"):
                 # Append the trend arrow to the pressure observation. Need this
                 # for non-mqtt pages
